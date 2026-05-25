@@ -1,0 +1,31 @@
+Paper Format Verification Report
+================================
+
+Input document: thesis.docx
+Template source: template.pdf
+Rules file: format_rules.json
+
+Summary
+-------
+Status: PASS_WITH_NOTES
+Checked items: 8
+Passed: 6
+Needs review: 2
+Failed: 0
+
+Checks
+------
+[PASS] Page size is A4.
+[PASS] Margins match the confirmed rules.
+[PASS] Body font and size match the confirmed rules.
+[PASS] Body paragraph line spacing matches the confirmed rules.
+[PASS] Heading 1 and Heading 2 styles were applied.
+[PASS] Figure and table captions use the configured prefixes.
+[REVIEW] Header/footer text should be checked visually against the template.
+[REVIEW] Reference style appears consistent, but citation metadata should be reviewed manually.
+
+Notes
+-----
+- Rules with null values were skipped during automated verification.
+- Visual review is still recommended for scanned templates or templates with complex layout.
+

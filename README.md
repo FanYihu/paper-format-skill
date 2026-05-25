@@ -61,8 +61,3 @@ Skill 会按三个阶段执行：
 
 - `examples/format_rules_template.json`：格式规则 JSON 模板
 - `examples/sample_output_report.txt`：示例核查报告
-
-# paper-format-skill
-# paper-format-skill
-# paper-format-skill
-# paper-format-skill

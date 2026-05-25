@@ -166,9 +166,9 @@ print(json.dumps(results, indent=2, ensure_ascii=False))
 
 ### 1C — Template is text (format requirements document / spec)
 
-When the user pastes or uploads a plain-text format specification, use Claude to
-parse it into format_rules.json directly. Ask Claude (inner call or direct reasoning)
-to extract every measurable rule and produce the canonical JSON below.
+When the user pastes or uploads a plain-text format specification, use the current
+agent's reasoning/model capability to parse it into format_rules.json directly.
+Extract every measurable rule and produce the canonical JSON below.
 Prompt template:
 ```
 以下是论文格式要求文字说明，请将其解析为结构化JSON，字段名与结构严格按照 format_rules.json
@@ -249,9 +249,15 @@ Only proceed after user confirms the rules table.
 
 ### Step 2.1: Unpack
 
+Use the current agent environment's DOCX/OOXML tooling. If a dedicated unpack
+helper is available, use it. Otherwise, unzip the `.docx` package into a temporary
+directory and operate on the OOXML files directly.
+
 ```bash
 pip install python-docx --break-system-packages -q
-python /mnt/skills/public/docx/scripts/office/unpack.py "$USER_DOCX" /tmp/unpacked/
+rm -rf /tmp/unpacked
+mkdir -p /tmp/unpacked
+unzip -q "$USER_DOCX" -d /tmp/unpacked
 ```
 
 ### Step 2.2: Deep-clear run-level and paragraph-level direct overrides
@@ -371,9 +377,8 @@ Footer page number uses a `<w:fldChar>` / `<w:instrText xml:space="preserve"> PA
 ### Step 2.5: Pack
 
 ```bash
-python /mnt/skills/public/docx/scripts/office/pack.py \
-    /tmp/unpacked/ /tmp/output_formatted.docx \
-    --original "$USER_DOCX"
+cd /tmp/unpacked
+zip -qr /tmp/output_formatted.docx .
 ```
 
 ---
@@ -528,11 +533,17 @@ Always present this checklist to the user alongside the auto report:
 ## Step 4: Deliver
 
 ```bash
-python /mnt/skills/public/docx/scripts/office/validate.py /tmp/output_formatted.docx
-cp /tmp/output_formatted.docx /mnt/user-data/outputs/formatted_paper.docx
+python - <<'PY'
+from docx import Document
+Document("/tmp/output_formatted.docx")
+print("DOCX opens successfully")
+PY
+mkdir -p ./outputs
+cp /tmp/output_formatted.docx ./outputs/formatted_paper.docx
 ```
 
-Call `present_files` with the output path.
+Return or attach the final file using the current agent environment's normal
+file-delivery mechanism.
 
 ---
 
@@ -554,6 +565,6 @@ Call `present_files` with the output path.
 ## Final Output to User (always all four)
 
 1. **Rules confirmation table** — Phase 1 output, wait for user approval
-2. **Formatted .docx** — via `present_files`
+2. **Formatted .docx** — delivered through the current agent environment's file output mechanism
 3. **Auto verification report** — ✅/❌ table from Phase 3.1
 4. **Manual confirmation checklist** — Phase 3.2 checklist for Word
